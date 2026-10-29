@@ -4,6 +4,7 @@
   var FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
   var SUIT_SYM = { spades: '♠', hearts: '♥', diamonds: '♦', clubs: '♣', joker: '🃏' };
   var SUIT_NAME = { spades: 'Пики', hearts: 'Черви', diamonds: 'Бубны', clubs: 'Трефы', joker: 'Джокер' };
+  var MONSTER_IMG = { 1: 'content/img/rat.jpg', 2: 'content/img/drowned.jpg', 3: 'content/img/cultist.jpg', 4: 'content/img/boss.jpg' };
 
   var S = {
     screen: 'create',
@@ -196,6 +197,8 @@
     var hearts = '';
     for (var i = 0; i < m.maxLife; i++) hearts += (i < m.life ? '♥' : '♡');
     $('combat-info').innerHTML = '<b>' + m.name + '</b> · уровень ' + m.level + ' · <span class="hearts">' + hearts + '</span>';
+    var img = $('combat-img');
+    if (img) img.src = MONSTER_IMG[m.level] || MONSTER_IMG[4];
     var bb = $('combat-buttons');
     bb.innerHTML = '';
     if (S.monsterAttacking) {

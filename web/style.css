@@ -110,6 +110,22 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .fate-choice em { font-style: normal; font-size: 0.85rem; color: var(--accent); }
 .fate-picked { padding: 12px; color: var(--accent); }
 .fate-picked b { color: #fff; }
+.cover {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.combat-img {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
 
 /* ---- Подземелье ---- */
 .hud {
