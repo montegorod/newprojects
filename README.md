@@ -40,6 +40,15 @@
 .\scripts\sync.cmd -Message "docs: краткое описание изменений"
 ```
 
+## Запуск пилота (MVP)
+
+```powershell
+cd web
+python -m http.server 8000
+```
+
+Открыть http://localhost:8000 — играет пролог «Прилив в Грейхэвене» (RU/EN, кубики, карта судьбы, статы, журнал).
+
 ## Структура
 
 ```text
@@ -52,6 +61,13 @@
 ├── ROADMAP.md         # планы
 ├── IDEAS.md           # список идей и их оценки
 ├── PILOT.md           # концепт пилотной книги-игры
+├── web/               # MVP: PWA игры (движок + пролог)
+│   ├── index.html
+│   ├── engine.js      # движок: статы, кубики, колода, ветвление
+│   ├── app.js         # UI и игровой цикл
+│   ├── style.css
+│   ├── manifest.webmanifest
+│   └── content/act1.json
 └── scripts/
     ├── sync.cmd       # точка входа: обходит Execution Policy
     └── sync.ps1       # коммит + push с авторизацией GitHub

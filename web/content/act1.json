@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "title_ru": "Прилив в Грейхэвене — Пролог",
+    "title_en": "The Greyhaven Tide — Prologue",
+    "version": 1
+  },
+  "stats": ["health", "sanity", "clues", "resources"],
+  "initial": { "health": 10, "sanity": 10, "clues": 0, "resources": 3 },
+  "start": "prologue",
+  "nodes": {
+    "prologue": {
+      "ru": { "text": "Поезд прибывает в Грейхэвен на закате. Туман стелется над заливом, и запах соли смешан с чем-то гнилостным. В кармане — телеграмма: «Пропадают люди. Приезжайте». Ты шагаешь на пустую платформу." },
+      "en": { "text": "The train reaches Greyhaven at dusk. Fog crawls over the bay, and the smell of salt is cut with something rotten. In your pocket is a telegram: 'People are disappearing. Come.' You step onto the empty platform." },
+      "choices": [
+        { "ru": "Осмотреть городские улицы", "en": "Walk the town streets", "next": "town" },
+        { "ru": "Пойти в порт, к рыбакам", "en": "Go to the docks, to the fishermen", "next": "port", "effects": { "add": { "clues": 1 } } },
+        { "ru": "Потянуть карту судьбы", "en": "Draw a fate card", "drawCard": true, "next": "fate" }
+      ]
+    },
+    "town": {
+      "ru": { "text": "Узкие улицы стихают к ночи. Ставни заколочены, но из-за одной двери тянет свет и шёпот. Что-то здесь не так — нужно присмотреться." },
+      "en": { "text": "The narrow streets fall quiet at night. The shutters are nailed shut, but behind one door there is light and a whisper. Something is wrong here — you need a closer look." },
+      "choices": [
+        { "ru": "Прислушаться и осмотреться", "en": "Listen and look closely", "check": { "expr": "d20", "target": 12 }, "next": "town_ok", "failNext": "town_fail" },
+        { "ru": "Отступить и пойти в порт", "en": "Back away and head to the docks", "next": "port" }
+      ]
+    },
+    "town_ok": {
+      "ru": { "text": "Ты замечаешь на дверном косяке царапины — не звериные, а похожие на знаки. Ты зарисовываешь их. Это улика." },
+      "en": { "text": "You notice scratches on the doorframe — not from an animal, but shaped like signs. You sketch them. A clue." },
+      "choices": [
+        { "ru": "Продолжить к порту", "en": "Continue to the docks", "next": "port", "effects": { "add": { "clues": 1 } } }
+      ]
+    },
+    "town_fail": {
+      "ru": { "text": "Ветка хрустнула под ногой, и шёпот за дверью оборвался. Тишина стала плотнее. По спине пробежал холод." },
+      "en": { "text": "A branch snaps underfoot, and the whisper behind the door stops. The silence thickens. A chill runs down your spine." },
+      "choices": [
+        { "ru": "Поспешить в порт", "en": "Hurry to the docks", "next": "port", "effects": { "add": { "sanity": -1 } } }
+      ]
+    },
+    "port": {
+      "ru": { "text": "У причалов качаются пустые лодки. Старый рыбак чинит сеть и не поднимает глаз. «Те, кто вышел в туман, — говорит он, — возвращаются другими. А некоторые не возвращаются вовсе»." },
+      "en": { "text": "Empty boats rock at the docks. An old fisherman mends his net without looking up. 'Those who go out into the fog,' he says, 'come back different. And some do not come back at all.'" },
+      "choices": [
+        { "ru": "Вглядеться в туман над заливом (случайная встреча)", "en": "Peer into the fog over the bay (random event)", "table": { "expr": "d100", "default": "silence", "rows": [ { "min": 1, "max": 33, "node": "stranger" }, { "min": 34, "max": 66, "node": "silence" }, { "min": 67, "max": 100, "node": "cold" } ] } },
+        { "ru": "Потянуть карту судьбы", "en": "Draw a fate card", "drawCard": true, "next": "fate" },
+        { "ru": "Пойти к старому дому на окраине", "en": "Go to the old house on the edge of town", "next": "nightfall" }
+      ]
+    },
+    "stranger": {
+      "ru": { "text": "В тумане на миг проступил силуэт — человек, стоящий по колено в воде. Он поднял руку, и фигура растворилась. У причала ты находишь обрывок бумаги с тем же знаком." },
+      "en": { "text": "In the fog a silhouette appears for a moment — a figure standing knee-deep in the water. It raises a hand and dissolves. By the dock you find a scrap of paper bearing the same sign." },
+      "choices": [
+        { "ru": "Идти к дому на окраине", "en": "Go to the house on the edge of town", "next": "nightfall", "effects": { "add": { "clues": 1, "sanity": -1 } } }
+      ]
+    },
+    "silence": {
+      "ru": { "text": "Туман безмолвен. Даже чайки замолчали. Ты чувствуешь, как за тобой наблюдают из воды, но ничего не видишь." },
+      "en": { "text": "The fog is silent. Even the gulls have stopped. You feel yourself watched from the water, but see nothing." },
+      "choices": [
+        { "ru": "Идти к дому на окраине", "en": "Go to the house on the edge of town", "next": "nightfall", "effects": { "add": { "sanity": -1 } } }
+      ]
+    },
+    "cold": {
+      "ru": { "text": "Волна накатила на камни, и с ней пришёл запах гнили из глубины. Голова закружилась; перед глазами мелькнули чужие, не твои воспоминания." },
+      "en": { "text": "A wave rolls onto the rocks, bringing the reek of the deep. Your head spins; alien memories flash behind your eyes." },
+      "choices": [
+        { "ru": "Идти к дому на окраине", "en": "Go to the house on the edge of town", "next": "nightfall", "effects": { "add": { "sanity": -2 } } }
+      ]
+    },
+    "fate": {
+      "ru": { "text": "Ты перебираешь колоду, и карта ложится на ладонь. Туман сгущается, словно сама ночь ждёт твоего решения." },
+      "en": { "text": "You thumb the deck, and a card settles into your palm. The fog thickens, as if the night itself waits for your decision." },
+      "choices": [
+        { "ru": "Идти к дому на окраине", "en": "Go to the house on the edge of town", "next": "nightfall" }
+      ]
+    },
+    "nightfall": {
+      "ru": { "text": "Туман сгущается. Где-то в заливе, под чёрной водой, что-то шевельнулось. Пролог окончен — история Грейхэвена продолжится в следующей части." },
+      "en": { "text": "The fog closes in. Somewhere in the bay, beneath the black water, something stirs. End of the prologue — the story of Greyhaven continues in the next part." },
+      "choices": []
+    }
+  }
+}

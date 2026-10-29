@@ -1,0 +1,10 @@
+{
+  "name": "Прилив в Грейхэвене",
+  "short_name": "Грейхэвен",
+  "description": "Соло-книга НРИ с ИИ-генерацией — лавкрафтовский ужас.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0c0e12",
+  "theme_color": "#0c0e12",
+  "icons": []
+}
