@@ -73,6 +73,11 @@
         '<b class="val">' + (val == null ? '—' : val) + '</b>';
       box.appendChild(row);
     });
+    if (!create.fate) {
+      $('fate-card').textContent = 'Тяни карту судьбы — масть даст стартовый бонус: ♠ защита · ♥ жизнь · ♦ золото · ♣ атака · 🃏 всё +1.';
+    } else {
+      $('fate-card').textContent = (create.fate.suit === 'joker' ? '🃏 Джокер' : SUIT_SYM[create.fate.suit] + ' ' + create.fate.rank) + ' — ' + (FATE_BONUS[create.fate.suit] ? FATE_BONUS[create.fate.suit].label : '');
+    }
     $('btn-start').disabled = !(create.attack != null && create.defence != null && create.life != null && create.sanity != null);
   }
 
@@ -96,7 +101,7 @@
     var el = $('fate-card');
     el.classList.remove('slide-in');
     void el.offsetWidth;
-    el.textContent = (card.suit === 'joker' ? '🃏 Джокер' : SUIT_SYM[card.suit] + ' ' + card.rank);
+    el.textContent = (card.suit === 'joker' ? '🃏 Джокер' : SUIT_SYM[card.suit] + ' ' + card.rank) + ' — ' + (FATE_BONUS[card.suit] ? FATE_BONUS[card.suit].label : '');
     el.classList.add('slide-in');
     log('Карта судьбы: ' + (FATE_BONUS[card.suit] ? FATE_BONUS[card.suit].label : ''));
     $('btn-start').disabled = !(create.attack != null && create.defence != null && create.life != null && create.sanity != null);
