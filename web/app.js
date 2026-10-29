@@ -3,6 +3,7 @@
   var G = window.Game2;
   var FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
   var SUIT_SYM = { spades: '♠', hearts: '♥', diamonds: '♦', clubs: '♣', joker: '🃏' };
+  var SUIT_NAME = { spades: 'Пики', hearts: 'Черви', diamonds: 'Бубны', clubs: 'Трефы', joker: 'Джокер' };
 
   var S = {
     screen: 'create',
@@ -41,7 +42,7 @@
   }
 
   // ===== СОЗДАНИЕ ГЕРОЯ =====
-  var create = { attack: null, defence: null, life: null, sanity: null, raw: {}, fate: null };
+  var create = { attack: null, defence: null, life: null, sanity: null, raw: {}, fate: null, fateChoices: null };
 
   var STAT_DEFS = [
     { key: 'attack',  label: 'Атака',   derive: function (r) { return r <= 2 ? 0 : (r <= 4 ? 1 : 2); }, note: '1d6: 1-2→0, 3-4→1, 5-6→2' },
@@ -51,11 +52,11 @@
   ];
 
   var FATE_BONUS = {
-    spades:   { label: '♠ Пики — +1 Защита',   apply: function (h) { h.defence += 1; } },
-    hearts:   { label: '♥ Черви — +1 Жизнь',   apply: function (h) { h.life += 1; } },
-    diamonds: { label: '♦ Бубны — +5 золота',  apply: function (h) { h.gold += 5; } },
-    clubs:    { label: '♣ Трефы — +1 Атака',   apply: function (h) { h.attack += 1; } },
-    joker:    { label: '🃏 Джокер — +1 ко всему', apply: function (h) { h.attack += 1; h.defence += 1; h.life += 1; h.sanity += 1; } }
+    spades:   { label: '♠ Пики — +1 Защита',   short: '+1 Защита',   apply: function (h) { h.defence += 1; } },
+    hearts:   { label: '♥ Черви — +1 Жизнь',   short: '+1 Жизнь',    apply: function (h) { h.life += 1; } },
+    diamonds: { label: '♦ Бубны — +5 золота',  short: '+5 золота',   apply: function (h) { h.gold += 5; } },
+    clubs:    { label: '♣ Трефы — +1 Атака',   short: '+1 Атака',    apply: function (h) { h.attack += 1; } },
+    joker:    { label: '🃏 Джокер — +1 ко всему', short: '+1 ко всему', apply: function (h) { h.attack += 1; h.defence += 1; h.life += 1; h.sanity += 1; } }
   };
 
   function renderCreate() {
@@ -73,11 +74,7 @@
         '<b class="val">' + (val == null ? '—' : val) + '</b>';
       box.appendChild(row);
     });
-    if (!create.fate) {
-      $('fate-card').textContent = 'Тяни карту судьбы — масть даст стартовый бонус: ♠ защита · ♥ жизнь · ♦ золото · ♣ атака · 🃏 всё +1.';
-    } else {
-      $('fate-card').textContent = (create.fate.suit === 'joker' ? '🃏 Джокер' : SUIT_SYM[create.fate.suit] + ' ' + create.fate.rank) + ' — ' + (FATE_BONUS[create.fate.suit] ? FATE_BONUS[create.fate.suit].label : '');
-    }
+    renderFate();
     $('btn-start').disabled = !(create.attack != null && create.defence != null && create.life != null && create.sanity != null);
   }
 
@@ -94,17 +91,39 @@
   }
 
   function drawFate() {
-    if (create.fate) return;
+    if (create.fateChoices || create.fate) return;
     if (!S.deck) S.deck = new G.Deck(true);
-    var card = S.deck.draw();
+    create.fateChoices = [S.deck.draw(), S.deck.draw(), S.deck.draw()];
+    renderFate();
+  }
+
+  function pickFate(i) {
+    var card = create.fateChoices[i];
     create.fate = card;
-    var el = $('fate-card');
-    el.classList.remove('slide-in');
-    void el.offsetWidth;
-    el.textContent = (card.suit === 'joker' ? '🃏 Джокер' : SUIT_SYM[card.suit] + ' ' + card.rank) + ' — ' + (FATE_BONUS[card.suit] ? FATE_BONUS[card.suit].label : '');
-    el.classList.add('slide-in');
     log('Карта судьбы: ' + (FATE_BONUS[card.suit] ? FATE_BONUS[card.suit].label : ''));
-    $('btn-start').disabled = !(create.attack != null && create.defence != null && create.life != null && create.sanity != null);
+    renderFate();
+  }
+
+  function renderFate() {
+    var fc = $('fate-card');
+    fc.innerHTML = '';
+    if (create.fate) {
+      fc.innerHTML = '<div class="fate-picked">✅ Выбрано: <b>' + FATE_BONUS[create.fate.suit].label + '</b></div>';
+      return;
+    }
+    if (!create.fateChoices) {
+      fc.textContent = '🎴 Тяни три карты судьбы и выбери одну — масть решает бонус.';
+      return;
+    }
+    create.fateChoices.forEach(function (card, i) {
+      var b = document.createElement('button');
+      b.className = 'fate-choice';
+      var sym = card.suit === 'joker' ? '🃏' : SUIT_SYM[card.suit];
+      var name = SUIT_NAME[card.suit] || 'Джокер';
+      b.innerHTML = '<b>' + sym + ' ' + card.rank + '</b><span>' + name + '</span><em>' + FATE_BONUS[card.suit].short + '</em>';
+      b.onclick = function () { pickFate(i); };
+      fc.appendChild(b);
+    });
   }
 
   function startDungeon() {

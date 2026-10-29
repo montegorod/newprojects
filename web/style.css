@@ -90,6 +90,26 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   to { transform: translateX(0) rotate(0); opacity: 1; }
 }
 .fate-card.slide-in { animation: slideIn 0.5s ease; border-color: var(--accent); color: var(--ink); }
+.fate-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+.fate-choice:hover { border-color: var(--accent); }
+.fate-choice b { font-size: 1.5rem; color: #fff; }
+.fate-choice span { font-size: 0.8rem; color: var(--dim); }
+.fate-choice em { font-style: normal; font-size: 0.85rem; color: var(--accent); }
+.fate-picked { padding: 12px; color: var(--accent); }
+.fate-picked b { color: #fff; }
 
 /* ---- Подземелье ---- */
 .hud {

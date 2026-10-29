@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-# Генерация иллюстраций-гравюр для «Прилив в Грейхэвене».
-# Сервис: Pollinations.ai — бесплатно, без API-ключа (есть rate-limit, поэтому с бэкоффом).
-# Результат: web/content/img/*.jpg  (уже готовые файлы пропускаются)
+# Генерация иллюстраций через Hugging Face FLUX (без водяных знаков).
+# Токен читается из secrets.env (в .gitignore). Модель — FLUX.1-dev (можно schnell через HF_MODEL).
 
 import os
+import re
 import time
-import urllib.parse
 import requests
 
-IMG_DIR = os.path.join(os.path.dirname(__file__), '..', 'web', 'content', 'img')
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+IMG_DIR = os.path.join(ROOT, 'web', 'content', 'img')
 os.makedirs(IMG_DIR, exist_ok=True)
+
+MODEL = os.environ.get('HF_MODEL', 'black-forest-labs/FLUX.1-dev')
+ENDPOINT = 'https://router.huggingface.co/hf-inference/models/' + MODEL
 
 STYLE = (
     "Dark woodcut engraving, {scene}, Lovecraftian coastal horror, "
@@ -33,39 +36,53 @@ SCENES = {
 }
 
 
-def fetch(name, scene, width, height):
-    prompt = STYLE.format(scene=scene)
-    url = "https://image.pollinations.ai/prompt/" + urllib.parse.quote(prompt)
-    params = {"width": width, "height": height, "nologo": "true", "model": "flux"}
-    r = requests.get(url, params=params, timeout=180)
-    r.raise_for_status()
-    path = os.path.join(IMG_DIR, name + ".jpg")
-    with open(path, "wb") as f:
-        f.write(r.content)
-    return path, len(r.content)
+def read_token():
+    p = os.path.join(ROOT, 'secrets.env')
+    if not os.path.exists(p):
+        return None
+    with open(p, encoding='utf-8') as f:
+        for line in f:
+            m = re.match(r'\s*HF_TOKEN\s*=\s*(.+)', line.strip())
+            if m:
+                return m.group(1).strip()
+    return None
+
+
+def generate(prompt, out_path, token):
+    h = {'Authorization': 'Bearer ' + token}
+    for attempt in range(4):
+        r = requests.post(ENDPOINT, headers={**h, 'Content-Type': 'application/json'}, json={'inputs': prompt}, timeout=240)
+        ct = r.headers.get('content-type', '')
+        if r.status_code == 200 and ct.startswith('image/'):
+            with open(out_path, 'wb') as f:
+                f.write(r.content)
+            return len(r.content)
+        print('  attempt', attempt + 1, '->', r.status_code, r.text[:140].replace('\n', ' '))
+        if r.status_code == 403:
+            print('  >>> 403: токен без прав на inference. Нужен Fine-grained токен с правом "Make calls to Inference Providers" и принятая лицензия модели.')
+            return None
+        time.sleep(20)
+    return None
 
 
 def main():
+    token = read_token()
+    if not token:
+        print('HF_TOKEN не найден в secrets.env')
+        return
+    ok = 0
     for name, (scene, w, h) in SCENES.items():
-        path = os.path.join(IMG_DIR, name + ".jpg")
-        if os.path.exists(path) and os.path.getsize(path) > 5000:
-            print("skip", name)
-            continue
-        done = False
-        for attempt in range(6):
-            try:
-                p, size = fetch(name, scene, w, h)
-                print("ok  ", name, size)
-                done = True
-                break
-            except Exception as e:
-                code = getattr(getattr(e, 'response', None), 'status_code', None)
-                print("fail", name, "attempt", attempt + 1, "http", code)
-                time.sleep(30)
-        if not done:
-            print("GIVEUP", name)
-        time.sleep(12)
+        out = os.path.join(IMG_DIR, name + '.jpg')
+        prompt = STYLE.format(scene=scene) + ', ' + str(w) + 'x' + str(h)
+        size = generate(prompt, out, token)
+        if size:
+            print('ok ', name, size)
+            ok += 1
+        else:
+            print('FAIL', name)
+        time.sleep(2)
+    print('готово:', ok, 'из', len(SCENES))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
