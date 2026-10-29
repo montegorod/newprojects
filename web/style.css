@@ -86,6 +86,14 @@ main {
   font-style: italic;
   margin: 0 0 14px;
 }
+.art img {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  border: 1px solid #1e232d;
+  border-radius: 8px;
+}
 
 .result {
   min-height: 1.4em;

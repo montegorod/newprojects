@@ -32,7 +32,13 @@ function render() {
   document.getElementById('title').textContent =
     lang === 'ru' ? engine.data.meta.title_ru : engine.data.meta.title_en;
   document.getElementById('story').innerHTML = esc(l.text).replace(/\n/g, '<br>');
-  document.getElementById('art').textContent = l.image ? '[иллюстрация: ' + l.image + ']' : '';
+  const artEl = document.getElementById('art');
+  const imgSrc = (engine.data.images || {})[engine.currentNode];
+  if (imgSrc) {
+    artEl.innerHTML = '<img src="' + esc(imgSrc) + '" alt="" loading="lazy">';
+  } else {
+    artEl.textContent = '';
+  }
 
   // статы
   const statsEl = document.getElementById('stats');

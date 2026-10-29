@@ -6,6 +6,11 @@
   },
   "stats": ["health", "sanity", "clues", "resources"],
   "initial": { "health": 10, "sanity": 10, "clues": 0, "resources": 3 },
+  "images": {
+    "prologue": "content/img/prologue.jpg",
+    "house": "content/img/house.jpg",
+    "cellar": "content/img/cellar.jpg"
+  },
   "start": "prologue",
   "nodes": {
     "prologue": {

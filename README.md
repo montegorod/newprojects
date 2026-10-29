@@ -71,8 +71,10 @@ python -m http.server 8000
 │   ├── app.js         # UI и игровой цикл
 │   ├── style.css
 │   ├── manifest.webmanifest
-│   └── content/act1.json
+│   ├── content/act1.json
+│   └── content/img/     # иллюстрации (*.jpg)
 └── scripts/
     ├── sync.cmd       # точка входа: обходит Execution Policy
-    └── sync.ps1       # коммит + push с авторизацией GitHub
+    ├── sync.ps1       # коммит + push с авторизацией GitHub
+    └── gen_images.py  # генерация иллюстраций (Pollinations)
 ```
