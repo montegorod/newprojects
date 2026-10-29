@@ -10,12 +10,12 @@
 
 ## Открытые
 
-### I-012 · HF-токен без прав на inference (403)
+### I-012 · HF-иллюстрации: нет кредитов (402), FLUX deprecated
 
 **Дата:** 2026-10-29  
-**Симптом:** генерация через Hugging Face возвращает `403: does not have sufficient permissions to call Inference Providers on behalf of user`.  
-**Причина:** токен типа Read не может вызывать inference; нужен Fine-grained токен с правом inference (и принятая лицензия модели).  
-**Что нужно:** владелец создаёт Fine-grained токен (https://huggingface.co/settings/tokens → New token → Fine-grained, отметить право inference) и принимает лицензию FLUX.1-dev (https://huggingface.co/black-forest-labs/FLUX.1-dev → Agree and access license).  
+**Симптом:** после исправления прав токена HF отвечает `402: You have no remaining credits`; FLUX.1-dev/schnell на `hf-inference` — `410 deprecated`.  
+**Причина:** бесплатный тариф HF не включает кредиты на генерацию изображений; FLUX на HF-инференсе deprecated (доступен SD3-medium, но за кредиты).  
+**Что нужно:** выбрать сервис: Replicate (FLUX, копейки, без водяного знака), Google Gemini (бесплатный тир) или HF PRO ($9/мес).  
 **Статус:** открыта.
 
 ---
