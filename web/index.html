@@ -4,28 +4,43 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0c0e12">
-  <title>Прилив в Грейхэвене</title>
+  <title>Прилив в Грейхэвене — v2</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1 id="title">Прилив в Грейхэвене</h1>
-    <div class="bar">
-      <button id="lang">EN</button>
-      <button id="restart" title="Новая игра">&#8635;</button>
-    </div>
-  </header>
+  <div id="app">
 
-  <main>
-    <div id="stats" class="stats"></div>
-    <div id="story" class="story"></div>
-    <div id="art" class="art"></div>
-    <div id="result" class="result"></div>
-    <div id="choices" class="choices"></div>
-    <div id="journal" class="journal"></div>
-  </main>
+    <section id="screen-create" class="screen">
+      <h1>Создание героя</h1>
+      <p class="sub">Бросай кубики и тяни карту судьбы — так задаются базовые статы.</p>
+      <div id="create-stats"></div>
+      <div id="fate-zone">
+        <button id="btn-fate" class="ghost">🂠 Карта судьбы</button>
+        <div id="fate-card" class="fate-card"></div>
+      </div>
+      <button id="btn-start" class="primary" disabled>Войти в подземелье</button>
+    </section>
 
+    <section id="screen-dungeon" class="screen" hidden>
+      <header class="hud">
+        <div class="hud-item">♥ <b id="hud-life">0</b></div>
+        <div class="hud-item">✦ <b id="hud-sanity">0</b></div>
+        <div class="hud-item">⚔ <b id="hud-atk">0</b></div>
+        <div class="hud-item">🛡 <b id="hud-def">0</b></div>
+        <div class="hud-item">💰 <b id="hud-gold">0</b></div>
+      </header>
+      <div id="map" class="map"></div>
+      <div id="log" class="log"></div>
+      <div id="combat" class="combat" hidden>
+        <div id="combat-info"></div>
+        <div id="combat-dice" class="dice big"></div>
+        <div id="combat-buttons"></div>
+      </div>
+      <div id="actions" class="actions"></div>
+    </section>
+
+  </div>
   <script src="engine.js"></script>
   <script src="app.js"></script>
 </body>

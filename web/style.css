@@ -1,10 +1,13 @@
 :root {
   --bg: #0c0e12;
   --panel: #12151c;
+  --panel2: #161a22;
   --ink: #d8d2c4;
   --dim: #8a8678;
   --accent: #2f7f7f;
-  --danger: #8a2f2f;
+  --danger: #b34545;
+  --gold: #c9a44c;
+  --border: #232a35;
 }
 
 * { box-sizing: border-box; }
@@ -14,107 +17,143 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: Georgia, 'Times New Roman', serif;
-  line-height: 1.6;
-  min-height: 100vh;
+  line-height: 1.5;
 }
 
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid #1e232d;
-}
+#app { max-width: 760px; margin: 0 auto; padding: 18px; }
 
-header h1 {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: normal;
-  letter-spacing: 0.5px;
-  color: var(--ink);
-}
+h1 { margin: 0 0 4px; font-weight: normal; letter-spacing: 0.5px; }
+.sub { color: var(--dim); margin: 0 0 18px; }
 
-.bar { display: flex; gap: 8px; }
-.bar button {
-  background: var(--panel);
-  color: var(--ink);
-  border: 1px solid #242a35;
-  border-radius: 6px;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-family: inherit;
-}
-.bar button:hover { border-color: var(--accent); }
-
-main {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 18px;
-}
-
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.stat {
-  background: var(--panel);
-  border: 1px solid #1e232d;
-  border-radius: 8px;
-  padding: 8px 12px;
-  min-width: 96px;
-  text-align: center;
-}
-.stat span { display: block; font-size: 0.72rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.6px; }
-.stat b { font-size: 1.3rem; font-weight: normal; color: var(--ink); }
-
-.story {
-  font-size: 1.05rem;
-  background: var(--panel);
-  border: 1px solid #1e232d;
-  border-left: 3px solid var(--accent);
-  border-radius: 8px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
-  white-space: pre-wrap;
-}
-
-.art {
-  min-height: 20px;
-  color: var(--dim);
-  font-style: italic;
-  margin: 0 0 14px;
-}
-.art img {
-  display: block;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  border: 1px solid #1e232d;
-  border-radius: 8px;
-}
-
-.result {
-  min-height: 1.4em;
-  color: var(--accent);
-  margin: 0 0 12px;
-  font-size: 0.95rem;
-}
-
-.choices { display: flex; flex-direction: column; gap: 10px; }
-.choice {
-  text-align: left;
-  background: var(--panel);
-  color: var(--ink);
-  border: 1px solid #242a35;
-  border-radius: 8px;
-  padding: 12px 16px;
-  cursor: pointer;
+button {
   font-family: inherit;
   font-size: 1rem;
+  background: var(--panel2);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
 }
-.choice:hover { border-color: var(--accent); background: #161a22; }
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+.primary { background: var(--accent); border-color: var(--accent); color: #eaffff; width: 100%; padding: 14px; margin-top: 16px; }
+.ghost { width: 100%; }
 
-.journal { margin-top: 22px; color: var(--dim); font-size: 0.85rem; }
-.journal p { margin: 2px 0; }
+/* ---- Создание героя ---- */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.stat-name { flex: 1; }
+.stat-name .note { display: block; font-size: 0.72rem; color: var(--dim); }
+.stat-row .val { min-width: 40px; text-align: center; font-size: 1.3rem; }
+
+.dice {
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: #0a0c10;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 1.7rem;
+  color: #fff;
+}
+.dice.big { width: 72px; height: 72px; font-size: 2.6rem; margin: 0 auto; }
+
+@keyframes shake {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-12deg) scale(1.06); }
+  50% { transform: rotate(10deg) scale(1.06); }
+  75% { transform: rotate(-6deg) scale(1.06); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.rolling { animation: shake 0.25s infinite; border-color: var(--accent) !important; }
+
+.fate-card {
+  min-height: 56px;
+  margin-top: 10px;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  text-align: center;
+  color: var(--dim);
+}
+@keyframes slideIn {
+  from { transform: translateX(-40px) rotate(-6deg); opacity: 0; }
+  to { transform: translateX(0) rotate(0); opacity: 1; }
+}
+.fate-card.slide-in { animation: slideIn 0.5s ease; border-color: var(--accent); color: var(--ink); }
+
+/* ---- Подземелье ---- */
+.hud {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.hud-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+.hud-item b { font-size: 1.1rem; }
+
+.map {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+.cell {
+  aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #0a0c10;
+  font-size: 1.2rem;
+  cursor: pointer;
+  user-select: none;
+}
+.cell.hidden { background: #080a0d; border-color: #161a22; }
+.cell.explored { background: var(--panel2); }
+.cell.hero { box-shadow: 0 0 0 2px var(--accent); }
+.cell.k-entrance { background: #1b2320; }
+.cell.k-boss { background: #2a1414; }
+.cell.k-room[data-clear="1"] { color: var(--dim); }
+
+.log {
+  height: 120px;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+.log div { padding: 2px 0; border-bottom: 1px solid #181d26; }
+.log div:first-child { color: var(--accent); }
+
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.actions button { flex: 1; min-width: 140px; }
+
+.combat {
+  background: var(--panel);
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.combat #combat-info { margin-bottom: 10px; }
+.combat .hearts { color: var(--danger); letter-spacing: 2px; }
+.combat #combat-buttons { display: flex; gap: 10px; margin-top: 10px; }
+.combat #combat-buttons button { flex: 1; }

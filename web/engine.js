@@ -1,124 +1,94 @@
-// Игровой движок (детерминированный): статы, кубики, колода, ветвление.
-// Нарратив лежит отдельно в content/*.json — движок его не сочиняет.
+// v2 — движок данжен-кроулера (в духе Four Against Darkness).
+(function (global) {
+  function rnd(n) { return Math.floor(Math.random() * n); }
+  function d(sides) { return rnd(sides) + 1; }
 
-function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+  // Взрывной d6: на 6 — переброс, значения складываются.
+  function explodingD6() {
+    let total = 0, faces = [], r;
+    do { r = d(6); faces.push(r); total += r; } while (r === 6);
+    return { total: total, faces: faces };
   }
-  return a;
-}
 
-class Dice {
-  static roll(sides) {
-    return Math.floor(Math.random() * sides) + 1;
-  }
-  // Формат: "d20", "2d6", "1d8+2"
-  static rollExpr(expr) {
-    const m = /^(\d*)d(\d+)([+-]\d+)?$/.exec(String(expr).replace(/\s/g, ''));
-    if (!m) throw new Error('Неверный формат кубика: ' + expr);
-    const count = m[1] ? parseInt(m[1], 10) : 1;
-    const sides = parseInt(m[2], 10);
-    const mod = m[3] ? parseInt(m[3], 10) : 0;
-    let total = 0;
-    for (let i = 0; i < count; i++) total += Dice.roll(sides);
-    return total + mod;
-  }
-}
+  const SUITS = ['spades', 'hearts', 'diamonds', 'clubs'];
+  const RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-const SUITS = ['spades', 'hearts', 'diamonds', 'clubs'];
-const RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-
-class Deck {
-  constructor(withJokers = true) {
-    this.cards = [];
-    for (const suit of SUITS) for (const rank of RANKS) this.cards.push({ suit, rank });
-    if (withJokers) this.cards.push({ suit: 'joker', rank: 'B' }, { suit: 'joker', rank: 'R' });
-    this.cards = shuffle(this.cards);
-  }
-  draw() { return this.cards.shift() ?? null; }
-  drawN(n) { const out = []; for (let i = 0; i < n; i++) { const c = this.draw(); if (c) out.push(c); } return out; }
-  get remaining() { return this.cards.length; }
-}
-
-class Player {
-  constructor(statsDef, initial) {
-    this.stats = {};
-    for (const s of statsDef) this.stats[s] = initial && initial[s] != null ? initial[s] : 0;
-    this.flags = new Set();
-    this.inventory = [];
-    this.journal = [];
-    this.hand = [];
-  }
-  get(name) { return this.stats[name] ?? 0; }
-  apply(effects) {
-    if (!effects) return;
-    if (effects.add) for (const [k, v] of Object.entries(effects.add)) this.stats[k] = (this.stats[k] ?? 0) + v;
-    if (effects.set) for (const [k, v] of Object.entries(effects.set)) this.stats[k] = v;
-    if (effects.flags) for (const f of effects.flags) this.flags.add(f);
-    if (effects.items) for (const it of effects.items) this.inventory.push(it);
-    if (effects.journal) this.journal.push(effects.journal);
-  }
-}
-
-class Engine {
-  constructor(gameData) {
-    this.data = gameData;
-    this.player = null;
-    this.deck = null;
-    this.currentNode = null;
-  }
-  start() {
-    this.player = new Player(this.data.stats, this.data.initial);
-    this.deck = new Deck(true);
-    this.currentNode = this.data.start;
-    return this;
-  }
-  node(id) { return this.data.nodes[id]; }
-  // Выбор по индексу. Возвращает { node, check?, draw? }.
-  choose(index) {
-    const node = this.data.nodes[this.currentNode];
-    const choice = node.choices[index];
-    if (!choice) return null;
-    this.player.apply(choice.effects);
-
-    let checkResult = null;
-    let drawResult = null;
-
-    if (choice.check) {
-      const c = choice.check;
-      const expr = c.expr || ('d' + c.die);
-      const roll = Dice.rollExpr(expr);
-      const ok = roll >= c.target;
-      checkResult = { expr, roll, target: c.target, ok };
-      if (!ok && c.failNext) {
-        this.currentNode = c.failNext;
-        return { check: checkResult, node: c.failNext };
+  class Deck {
+    constructor(withJokers) {
+      if (withJokers === undefined) withJokers = true;
+      this.cards = [];
+      for (let i = 0; i < SUITS.length; i++) {
+        for (let j = 0; j < RANKS.length; j++) this.cards.push({ suit: SUITS[i], rank: RANKS[j] });
+      }
+      if (withJokers) this.cards.push({ suit: 'joker', rank: 'B' }, { suit: 'joker', rank: 'R' });
+      for (let k = this.cards.length - 1; k > 0; k--) {
+        const m = rnd(k + 1);
+        const t = this.cards[k]; this.cards[k] = this.cards[m]; this.cards[m] = t;
       }
     }
-
-    if (choice.table) {
-      const t = choice.table;
-      const roll = Dice.rollExpr(t.expr);
-      let target = t.default;
-      for (const row of t.rows) {
-        if (roll >= row.min && roll <= row.max) { target = row.node; break; }
-      }
-      checkResult = { expr: t.expr, roll, table: true };
-      this.currentNode = target;
-      return { check: checkResult, node: target };
-    }
-
-    if (choice.drawCard) {
-      const card = this.deck.draw();
-      drawResult = { card, remaining: this.deck.remaining };
-    }
-
-    this.currentNode = choice.next;
-    return { check: checkResult, draw: drawResult, node: choice.next };
+    draw() { return this.cards.shift() || null; }
   }
-}
 
-if (typeof window !== 'undefined') window.GameEngine = { Dice, Deck, Player, Engine, SUITS, RANKS };
-if (typeof module !== 'undefined') module.exports = { Dice, Deck, Player, Engine, SUITS, RANKS };
+  function rollRoomContent() {
+    const r = d(6);
+    if (r <= 2) return 'monster';
+    if (r === 3) return 'trap';
+    if (r === 4) return 'treasure';
+    if (r === 5) return 'empty';
+    return 'fountain';
+  }
+
+  class Dungeon {
+    constructor(size, rooms) {
+      if (size === undefined) size = 7;
+      if (rooms === undefined) rooms = 6;
+      this.size = size;
+      this.cells = [];
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          this.cells.push({ x: x, y: y, kind: 'corridor', content: null, explored: false, cleared: false });
+        }
+      }
+      const sx = Math.floor(size / 2);
+      this.start = { x: sx, y: size - 1 };
+      this.set(sx, size - 1, { kind: 'entrance', explored: true });
+
+      let cx = sx, cy = size - 2, made = 0;
+      const dirs = [[-1, 0], [1, 0], [0, -1]];
+      while (cy >= 0 && made < rooms) {
+        this.set(cx, cy, { kind: 'room', content: rollRoomContent() });
+        made++;
+        const dd = dirs[rnd(dirs.length)];
+        cx = Math.max(0, Math.min(size - 1, cx + dd[0]));
+        cy = cy + dd[1];
+      }
+      const bx = cx, by = Math.max(0, cy);
+      this.boss = { x: bx, y: by };
+      this.set(bx, by, { kind: 'boss', content: 'boss' });
+    }
+    set(x, y, patch) {
+      const c = this.cell(x, y);
+      if (c) { for (const k in patch) c[k] = patch[k]; }
+      return c;
+    }
+    cell(x, y) {
+      for (let i = 0; i < this.cells.length; i++) {
+        if (this.cells[i].x === x && this.cells[i].y === y) return this.cells[i];
+      }
+      return null;
+    }
+    neighbors(x, y) {
+      return [[0, -1], [0, 1], [-1, 0], [1, 0]]
+        .map(p => ({ x: x + p[0], y: y + p[1] }))
+        .filter(p => p.x >= 0 && p.y >= 0 && p.x < this.size && p.y < this.size);
+    }
+  }
+
+  const MONSTER_NAMES = ['Гнилая крыса', 'Утопленник', 'Культист', 'Глубинное отродье'];
+  function makeMonster(level) {
+    const life = level >= 4 ? 4 : 1;
+    return { name: MONSTER_NAMES[Math.min(level - 1, MONSTER_NAMES.length - 1)], level: level, life: life, maxLife: life };
+  }
+
+  global.Game2 = { d: d, explodingD6: explodingD6, Deck: Deck, Dungeon: Dungeon, makeMonster: makeMonster, rollRoomContent: rollRoomContent };
+})(window);
