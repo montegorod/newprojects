@@ -45,14 +45,11 @@ try {
         $outFile = Join-Path $tmp 'out.txt'
         $errFile = Join-Path $tmp 'err.txt'
         "protocol=https`nhost=github.com`n`n" | Set-Content -LiteralPath $inFile -NoNewline
-        $proc = Start-Process -FilePath $gcm -ArgumentList 'get' `
-            -RedirectStandardInput $inFile `
-            -RedirectStandardOutput $outFile `
-            -RedirectStandardError $errFile `
-            -Wait -PassThru -NoNewWindow
-        if ($proc.ExitCode -ne 0) {
+        # Именно cmd с файловым редиректом: Start-Process в песочнице получает Access denied.
+        cmd /c "`"$gcm`" get < `"$inFile`" > `"$outFile`" 2> `"$errFile`""
+        if ($LASTEXITCODE -ne 0) {
             $errText = Get-Content -LiteralPath $errFile -Raw -ErrorAction SilentlyContinue
-            throw "GCM get завершился с кодом $($proc.ExitCode): $errText"
+            throw "GCM get завершился с кодом ${LASTEXITCODE}: $errText"
         }
         $cred = Get-Content -LiteralPath $outFile
         $user = ($cred | Where-Object { $_ -like 'username=*' } | Select-Object -First 1) -replace '^username=', ''
