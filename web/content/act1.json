@@ -1,8 +1,8 @@
 {
   "meta": {
-    "title_ru": "Прилив в Грейхэвене — Пролог",
-    "title_en": "The Greyhaven Tide — Prologue",
-    "version": 1
+    "title_ru": "Прилив в Грейхэвене",
+    "title_en": "The Greyhaven Tide",
+    "version": 2
   },
   "stats": ["health", "sanity", "clues", "resources"],
   "initial": { "health": 10, "sanity": 10, "clues": 0, "resources": 3 },
@@ -77,8 +77,153 @@
       ]
     },
     "nightfall": {
-      "ru": { "text": "Туман сгущается. Где-то в заливе, под чёрной водой, что-то шевельнулось. Пролог окончен — история Грейхэвена продолжится в следующей части." },
-      "en": { "text": "The fog closes in. Somewhere in the bay, beneath the black water, something stirs. End of the prologue — the story of Greyhaven continues in the next part." },
+      "ru": { "text": "Ты идёшь через туман к старому дому на окраине. Окна темны, но ты чувствуешь, что тебя ждут." },
+      "en": { "text": "You walk through the fog to the old house on the edge of town. The windows are dark, but you feel you are expected." },
+      "choices": [
+        { "ru": "Подойти к двери", "en": "Approach the door", "next": "house" }
+      ]
+    },
+    "house": {
+      "ru": { "text": "Дом стоит на самом краю, за ржавой оградой. Окна темны, но в одном из них — слабый огонёк свечи. Крыльцо покосилось, будто дом врос в землю." },
+      "en": { "text": "The house stands at the very edge, behind a rusted gate. The windows are dark, but in one of them a candle flickers faintly. The porch has sunk, as if the house has settled into the earth." },
+      "choices": [
+        { "ru": "Постучать в дверь", "en": "Knock on the door", "next": "knock" },
+        { "ru": "Заглянуть в окно", "en": "Look through the window", "check": { "expr": "d20", "target": 12 }, "next": "window_ok", "failNext": "window_fail" },
+        { "ru": "Обойти дом", "en": "Circle the house", "next": "around" }
+      ]
+    },
+    "knock": {
+      "ru": { "text": "На стук никто не отвечает. Дверь приоткрыта и со скрипом подаётся внутрь. Из тёмного проёма тянет холодом и старой пылью." },
+      "en": { "text": "No one answers the knock. The door is ajar and groans inward. Cold air and old dust drift from the dark doorway." },
+      "choices": [
+        { "ru": "Войти в прихожую", "en": "Step into the hall", "next": "hall" },
+        { "ru": "Не входить, обойти дом", "en": "Hold back and circle the house", "next": "around" }
+      ]
+    },
+    "window_ok": {
+      "ru": { "text": "Сквозь щель в ставне ты видишь, как по комнате плывёт огонёк свечи, а за ним — тень, которая движется не так, как должен двигаться человек. Ты зарисовываешь увиденное." },
+      "en": { "text": "Through a gap in the shutter you see a candle drifting through the room, and behind it a shadow that moves as a person should not. You sketch what you see." },
+      "choices": [
+        { "ru": "Пройти к задней двери", "en": "Go to the back door", "next": "hall", "effects": { "add": { "clues": 1 } } }
+      ]
+    },
+    "window_fail": {
+      "ru": { "text": "Стекло запотело от твоего дыхания, и в отражении на миг показалось, что позади тебя стоит кто-то ещё. Ты резко оборачиваешься — никого." },
+      "en": { "text": "The glass fogs with your breath, and in the reflection, for a moment, someone seems to stand behind you. You spin around — no one." },
+      "choices": [
+        { "ru": "Обойти дом", "en": "Circle the house", "next": "around", "effects": { "add": { "sanity": -1 } } }
+      ]
+    },
+    "around": {
+      "ru": { "text": "За домом ты находишь присыпанную землёй дверь погреба. На досках вырезан тот же знак, что и на дверном косяке в городе." },
+      "en": { "text": "Behind the house you find a cellar door half-buried in earth. On the boards is carved the same sign you saw on the doorframe in town." },
+      "choices": [
+        { "ru": "Открыть погреб", "en": "Open the cellar", "next": "cellar", "effects": { "add": { "clues": 1 } } },
+        { "ru": "Вернуться к парадной двери", "en": "Return to the front door", "next": "knock" }
+      ]
+    },
+    "hall": {
+      "ru": { "text": "В прихожей пахнет солью и тлением. На стенах — портреты, и тебе кажется, что глаза на них следят за тобой. Половицы скрипят под ногами." },
+      "en": { "text": "The hall smells of salt and decay. Portraits line the walls, and you feel their eyes follow you. The floorboards creak underfoot." },
+      "choices": [
+        { "ru": "Осмотреть кабинет", "en": "Search the study", "next": "study" },
+        { "ru": "Подняться наверх", "en": "Go upstairs", "next": "upstairs" },
+        { "ru": "Спуститься к погребу", "en": "Go down to the cellar", "next": "cellar" }
+      ]
+    },
+    "study": {
+      "ru": { "text": "Кабинет завален бумагами. На столе — дневник пропавшего хозяина дома, раскрытый на последней записи. Почерк неровный, торопливый." },
+      "en": { "text": "The study is buried in papers. On the desk lies the diary of the house's missing owner, open to the last entry. The handwriting is uneven, hurried." },
+      "choices": [
+        { "ru": "Прочитать дневник", "en": "Read the diary", "check": { "expr": "d20", "target": 14 }, "next": "study_ok", "failNext": "study_fail" },
+        { "ru": "Обыскать ящики", "en": "Search the drawers", "next": "drawers" }
+      ]
+    },
+    "study_ok": {
+      "ru": { "text": "Последняя запись: «Оно под заливом, и оно проснулось. Те, кто слушает шёпот, приносят ему имена. Я больше не хочу слышать». Ты понимаешь: пропавшие не утонули." },
+      "en": { "text": "The last entry reads: 'It is beneath the bay, and it has woken. Those who hear the whisper bring it names. I do not want to hear anymore.' You understand: the missing did not drown." },
+      "choices": [
+        { "ru": "Вернуться в прихожую", "en": "Return to the hall", "next": "hall", "effects": { "add": { "clues": 2 } } }
+      ]
+    },
+    "study_fail": {
+      "ru": { "text": "Страницы слиплись от сырости. Ты различаешь лишь обрывки: «шёпот… имена… не выходи…». Больше ничего не разобрать." },
+      "en": { "text": "The pages are stuck together with damp. You make out only fragments: 'whisper… names… do not go…' Nothing more is legible." },
+      "choices": [
+        { "ru": "Вернуться в прихожую", "en": "Return to the hall", "next": "hall" }
+      ]
+    },
+    "drawers": {
+      "ru": { "text": "В ящиках — старые карты залива и связка ключей. Ты берёшь то, что может пригодиться." },
+      "en": { "text": "In the drawers are old charts of the bay and a ring of keys. You take what might be useful." },
+      "choices": [
+        { "ru": "Вернуться в прихожую", "en": "Return to the hall", "next": "hall", "effects": { "add": { "resources": 1 } } }
+      ]
+    },
+    "upstairs": {
+      "ru": { "text": "Наверху — детская комната с опрокинутой колыбелью и музыкальной шкатулкой. Она играет сама собой — тонкую, нездешнюю мелодию." },
+      "en": { "text": "Upstairs is a child's room with an overturned cradle and a music box. It plays by itself — a thin, unearthly melody." },
+      "choices": [
+        { "ru": "Открыть шкатулку", "en": "Open the music box", "drawCard": true, "next": "upstairs_after" },
+        { "ru": "Вернуться в прихожую", "en": "Return to the hall", "next": "hall" }
+      ]
+    },
+    "upstairs_after": {
+      "ru": { "text": "Шкатулка открывается, и внутри — высохший цветок и локон волос. Мелодия обрывается. Тебе кажется, что стены на миг сдвинулись ближе." },
+      "en": { "text": "The box opens to a dried flower and a lock of hair. The melody stops. For a moment the walls seem to lean closer." },
+      "choices": [
+        { "ru": "Вернуться в прихожую", "en": "Return to the hall", "next": "hall", "effects": { "add": { "sanity": -1 } } }
+      ]
+    },
+    "cellar": {
+      "ru": { "text": "В погребе пахнет солью и гнилью — тем же запахом, что у залива. В дальней стене — каменная дверь, которой здесь не должно быть. За ней что-то тихо, влажно шевелится." },
+      "en": { "text": "The cellar smells of salt and rot — the same scent as the bay. In the far wall is a stone door that should not be here. Behind it, something stirs quietly, wetly." },
+      "choices": [
+        { "ru": "Открыть каменную дверь", "en": "Open the stone door", "next": "cellar_door" },
+        { "ru": "Отступить", "en": "Step back", "next": "hall" }
+      ]
+    },
+    "cellar_door": {
+      "ru": { "text": "За дверью — пещера, уходящая вниз, к чёрной воде. Шёпот здесь становится словами, но ты не можешь разобрать ни одного." },
+      "en": { "text": "Beyond the door is a cavern sloping down to black water. Here the whisper becomes words, but you cannot make out a single one." },
+      "choices": [
+        { "ru": "Спуститься к воде", "en": "Descend to the water", "check": { "expr": "d20", "target": 14 }, "next": "descend_ok", "failNext": "descend_fail" },
+        { "ru": "Потянуть карту судьбы", "en": "Draw a fate card", "drawCard": true, "next": "cellar_fate" },
+        { "ru": "Отступить и уйти", "en": "Step back and leave", "next": "retreat" }
+      ]
+    },
+    "cellar_fate": {
+      "ru": { "text": "Карта ложится на ладонь, и шёпот на миг стихает, будто прислушиваясь. Ты чувствуешь себя замеченным." },
+      "en": { "text": "The card settles in your palm, and the whisper stills for a moment, as if listening. You feel yourself noticed." },
+      "choices": [
+        { "ru": "Спуститься к воде", "en": "Descend to the water", "check": { "expr": "d20", "target": 14 }, "next": "descend_ok", "failNext": "descend_fail" },
+        { "ru": "Отступить", "en": "Step back", "next": "retreat" }
+      ]
+    },
+    "descend_ok": {
+      "ru": { "text": "У самой воды ты понимаешь: город заключил сделку. Оно даёт им рыбу и тишину, а они отдают ему тех, кто приходит с вопросами. Ты — следующий, если останешься." },
+      "en": { "text": "At the water's edge you understand: the town made a bargain. It gives them fish and silence, and they give it those who come asking questions. You are next, if you stay." },
+      "choices": [
+        { "ru": "Бежать из дома", "en": "Flee the house", "next": "retreat", "effects": { "add": { "clues": 2, "sanity": -2 } } }
+      ]
+    },
+    "descend_fail": {
+      "ru": { "text": "Вода поднимается навстречу — холодная, голодная. Она касается твоих щиколоток, и шёпот вливается в уши. Ты отступаешь, спотыкаясь." },
+      "en": { "text": "The water rises to meet you — cold, hungry. It touches your ankles, and the whisper pours into your ears. You stagger back." },
+      "choices": [
+        { "ru": "Бежать", "en": "Flee", "next": "retreat", "effects": { "add": { "health": -1, "sanity": -3 } } }
+      ]
+    },
+    "retreat": {
+      "ru": { "text": "Ты вырываешься из дома в ночь. Туман сгустился до того, что не видно дороги. Позади, в окне, движется свеча." },
+      "en": { "text": "You burst out of the house into the night. The fog has thickened until the road is gone. Behind you, in the window, a candle moves." },
+      "choices": [
+        { "ru": "Вернуться в город", "en": "Return to town", "next": "act1_end" }
+      ]
+    },
+    "act1_end": {
+      "ru": { "text": "Ты идёшь прочь, но чувствуешь: теперь оно знает твоё имя. Акт I окончен — продолжение в Акте II." },
+      "en": { "text": "You walk away, but you feel it now knows your name. End of Act I — to be continued in Act II." },
       "choices": []
     }
   }
