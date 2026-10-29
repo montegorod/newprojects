@@ -27,7 +27,7 @@
 **Дата:** 2026-10-29  
 **Симптом:** `& .\scripts\sync.ps1` блокируется Execution Policy; после обхода парсер ругается на кириллицу; затем `Start-Process` для GCM возвращает `Access is denied`.  
 **Причина:** три независимые особенности среды: Restricted Execution Policy; PowerShell 5.1 читает UTF-8 без BOM как ANSI; песочница запрещает `Start-Process` с редиректом.  
-**Решение:** `scripts/sync.cmd` с `-ExecutionPolicy Bypass`; файл сохранён в UTF-8 с BOM; GCM вызывается через `cmd /c` с файловым редиректом.  
+**Решение:** `scripts/sync.cmd` с `-ExecutionPolicy Bypass` (только ASCII — иначе cmd ломает разбор при смене кодовой страницы); файл сохранён в UTF-8 с BOM; GCM вызывается через `cmd /c` с файловым редиректом.  
 **Проверка:** `scripts\sync.cmd -Message "..."` закоммитил и запушил изменения; `main` отслеживает `origin/main`.  
 **Статус:** решена (обход).
 
