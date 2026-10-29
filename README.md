@@ -34,7 +34,7 @@
 4. Перед финальным ответом обновить память и выполнить:
 
 ```powershell
-./scripts/sync.ps1 -Message "docs: краткое описание изменений"
+.\scripts\sync.cmd -Message "docs: краткое описание изменений"
 ```
 
 ## Структура
@@ -48,5 +48,6 @@
 ├── ISSUES.md          # журнал проблем и решений
 ├── ROADMAP.md         # планы
 └── scripts/
+    ├── sync.cmd       # точка входа: обходит Execution Policy
     └── sync.ps1       # коммит + push с авторизацией GitHub
 ```
