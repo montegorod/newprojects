@@ -1,0 +1,6 @@
+{
+  "sessionId": "session-d494c74a-dbe8-44aa-a63e-d9d791a57d11",
+  "threshold": 60,
+  "checkEveryMinutes": 5,
+  "notifyCooldownMinutes": 720
+}
